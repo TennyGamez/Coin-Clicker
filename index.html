@@ -6,56 +6,48 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: linear-gradient(135deg, #fff3b0, #ffd166);
-      padding: 50px 15px;
-      margin: 0;
+      background: #f0f0f0;
+      padding-top: 60px;
     }
 
     h1 {
-      font-size: 42px;
-      color: #7a4b00;
+      font-size: 40px;
     }
 
     #score {
-      font-size: 36px;
-      font-weight: bold;
-      margin: 25px;
+      font-size: 32px;
+      margin: 20px;
     }
 
     button {
-      border: none;
-      border-radius: 15px;
-      cursor: pointer;
+      font-size: 22px;
       padding: 15px 25px;
       margin: 10px;
-      font-size: 20px;
-      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
     }
 
     #clickButton {
-      background: #f5a623;
+      background: #4CAF50;
       color: white;
-      font-size: 32px;
-      padding: 25px 55px;
-    }
-
-    #clickButton:active {
-      transform: scale(0.95);
+      font-size: 30px;
+      padding: 25px 50px;
     }
 
     #upgradeButton {
-      background: #4caf50;
+      background: #2196F3;
       color: white;
     }
 
     #musicButton {
-      background: #555;
+      background: #8e44ad;
       color: white;
     }
 
     .downloads {
-      margin-top: 35px;
-      font-size: 21px;
+      margin-top: 40px;
+      font-size: 20px;
     }
   </style>
 </head>
@@ -106,7 +98,7 @@
       }
     }
 
-    function playSound(frequency, duration, type = "sine") {
+    function playSound(frequency, duration, type, volume) {
       startAudio();
 
       const oscillator = audioContext.createOscillator();
@@ -115,7 +107,8 @@
       oscillator.type = type;
       oscillator.frequency.value = frequency;
 
-      gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+      gain.gain.setValueAtTime(volume, audioContext.currentTime);
+
       gain.gain.exponentialRampToValueAtTime(
         0.001,
         audioContext.currentTime + duration
@@ -129,14 +122,14 @@
     }
 
     function playClickSound() {
-      playSound(700, 0.08, "square");
+      playSound(750, 0.07, "square", 0.10);
     }
 
     function playUpgradeSound() {
-      playSound(500, 0.12, "sine");
+      playSound(500, 0.12, "sine", 0.15);
 
-      setTimeout(() => {
-        playSound(800, 0.18, "sine");
+      setTimeout(function() {
+        playSound(800, 0.18, "sine", 0.15);
       }, 100);
     }
 
@@ -146,16 +139,16 @@
       const notes = [261.63, 329.63, 392, 523.25];
       const note = notes[Math.floor(Math.random() * notes.length)];
 
-      playSound(note, 0.25, "sine");
+      playSound(note, 0.3, "sine", 0.035);
     }
 
-    clickButton.addEventListener("click", () => {
+    clickButton.addEventListener("click", function() {
       coins += power;
       playClickSound();
       updateGame();
     });
 
-    upgradeButton.addEventListener("click", () => {
+    upgradeButton.addEventListener("click", function() {
       if (coins >= upgradeCost) {
         coins -= upgradeCost;
         power += 1;
@@ -164,11 +157,11 @@
         playUpgradeSound();
         updateGame();
       } else {
-        playSound(180, 0.12, "sawtooth");
+        playSound(180, 0.12, "sawtooth", 0.08);
       }
     });
 
-    musicButton.addEventListener("click", () => {
+    musicButton.addEventListener("click", function() {
       startAudio();
 
       musicOn = !musicOn;
@@ -178,9 +171,10 @@
 
         playMusicNote();
 
-        musicTimer = setInterval(() => {
+        musicTimer = setInterval(function() {
           playMusicNote();
         }, 700);
+
       } else {
         musicButton.textContent = "🎵 Music: OFF";
 
