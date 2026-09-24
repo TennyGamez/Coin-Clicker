@@ -1,59 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Super Clicker</title>
+  <title>Coin Clicker</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: #f0f0f0;
-      padding-top: 60px;
+      background: linear-gradient(135deg, #fff3b0, #ffd166);
+      padding: 50px 15px;
+      margin: 0;
     }
 
     h1 {
-      font-size: 40px;
+      font-size: 42px;
+      color: #7a4b00;
     }
 
     #score {
-      font-size: 32px;
-      margin: 20px;
+      font-size: 36px;
+      font-weight: bold;
+      margin: 25px;
     }
 
     button {
-      font-size: 22px;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
       padding: 15px 25px;
       margin: 10px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
+      font-size: 20px;
+      font-weight: bold;
     }
 
     #clickButton {
-      background: #4CAF50;
+      background: #f5a623;
       color: white;
-      font-size: 30px;
-      padding: 25px 50px;
+      font-size: 32px;
+      padding: 25px 55px;
+    }
+
+    #clickButton:active {
+      transform: scale(0.95);
     }
 
     #upgradeButton {
-      background: #2196F3;
+      background: #4caf50;
+      color: white;
+    }
+
+    #musicButton {
+      background: #555;
       color: white;
     }
 
     .downloads {
-      margin-top: 40px;
-      font-size: 20px;
+      margin-top: 35px;
+      font-size: 21px;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>🖱️ Super Clicker</h1>
+  <h1>🪙 Coin Clicker</h1>
 
-  <div id="score">Clicks: 0</div>
+  <div id="score">Coins: 0</div>
 
-  <button id="clickButton">CLICK!</button>
+  <button id="clickButton">🪙 CLICK!</button>
 
   <br>
 
@@ -61,36 +74,123 @@
     Upgrade (+1 per click) — Cost: 25
   </button>
 
+  <br>
+
+  <button id="musicButton">🎵 Music: OFF</button>
+
   <div class="downloads">
     🌎 Total Downloads: <span id="downloads">0</span>
   </div>
 
   <script>
-    let clicks = 0;
+    let coins = 0;
     let power = 1;
     let upgradeCost = 25;
+
+    let audioContext;
+    let musicOn = false;
+    let musicTimer;
 
     const score = document.getElementById("score");
     const clickButton = document.getElementById("clickButton");
     const upgradeButton = document.getElementById("upgradeButton");
-    const downloads = document.getElementById("downloads");
+    const musicButton = document.getElementById("musicButton");
+
+    function startAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    }
+
+    function playSound(frequency, duration, type = "sine") {
+      startAudio();
+
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      oscillator.type = type;
+      oscillator.frequency.value = frequency;
+
+      gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioContext.currentTime + duration
+      );
+
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    function playClickSound() {
+      playSound(700, 0.08, "square");
+    }
+
+    function playUpgradeSound() {
+      playSound(500, 0.12, "sine");
+
+      setTimeout(() => {
+        playSound(800, 0.18, "sine");
+      }, 100);
+    }
+
+    function playMusicNote() {
+      if (!musicOn) return;
+
+      const notes = [261.63, 329.63, 392, 523.25];
+      const note = notes[Math.floor(Math.random() * notes.length)];
+
+      playSound(note, 0.25, "sine");
+    }
 
     clickButton.addEventListener("click", () => {
-      clicks += power;
+      coins += power;
+      playClickSound();
       updateGame();
     });
 
     upgradeButton.addEventListener("click", () => {
-      if (clicks >= upgradeCost) {
-        clicks -= upgradeCost;
+      if (coins >= upgradeCost) {
+        coins -= upgradeCost;
         power += 1;
         upgradeCost *= 2;
+
+        playUpgradeSound();
         updateGame();
+      } else {
+        playSound(180, 0.12, "sawtooth");
+      }
+    });
+
+    musicButton.addEventListener("click", () => {
+      startAudio();
+
+      musicOn = !musicOn;
+
+      if (musicOn) {
+        musicButton.textContent = "🎵 Music: ON";
+
+        playMusicNote();
+
+        musicTimer = setInterval(() => {
+          playMusicNote();
+        }, 700);
+      } else {
+        musicButton.textContent = "🎵 Music: OFF";
+
+        clearInterval(musicTimer);
       }
     });
 
     function updateGame() {
-      score.textContent = "Clicks: " + clicks;
+      score.textContent = "Coins: " + coins;
+
       upgradeButton.textContent =
         "Upgrade (+" + power + " per click) — Cost: " + upgradeCost;
     }
