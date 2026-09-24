@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Super Clicker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      padding-top: 60px;
+    }
+
+    h1 {
+      font-size: 40px;
+    }
+
+    #score {
+      font-size: 32px;
+      margin: 20px;
+    }
+
+    button {
+      font-size: 22px;
+      padding: 15px 25px;
+      margin: 10px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    #clickButton {
+      background: #4CAF50;
+      color: white;
+      font-size: 30px;
+      padding: 25px 50px;
+    }
+
+    #upgradeButton {
+      background: #2196F3;
+      color: white;
+    }
+
+    .downloads {
+      margin-top: 40px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🖱️ Super Clicker</h1>
+
+  <div id="score">Clicks: 0</div>
+
+  <button id="clickButton">CLICK!</button>
+
+  <br>
+
+  <button id="upgradeButton">
+    Upgrade (+1 per click) — Cost: 25
+  </button>
+
+  <div class="downloads">
+    🌎 Total Downloads: <span id="downloads">0</span>
+  </div>
+
+  <script>
+    let clicks = 0;
+    let power = 1;
+    let upgradeCost = 25;
+
+    const score = document.getElementById("score");
+    const clickButton = document.getElementById("clickButton");
+    const upgradeButton = document.getElementById("upgradeButton");
+    const downloads = document.getElementById("downloads");
+
+    clickButton.addEventListener("click", () => {
+      clicks += power;
+      updateGame();
+    });
+
+    upgradeButton.addEventListener("click", () => {
+      if (clicks >= upgradeCost) {
+        clicks -= upgradeCost;
+        power += 1;
+        upgradeCost *= 2;
+        updateGame();
+      }
+    });
+
+    function updateGame() {
+      score.textContent = "Clicks: " + clicks;
+      upgradeButton.textContent =
+        "Upgrade (+" + power + " per click) — Cost: " + upgradeCost;
+    }
+  </script>
+
+</body>
+</html>
