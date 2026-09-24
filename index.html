@@ -187,7 +187,26 @@
 
       upgradeButton.textContent =
         "Upgrade (+" + power + " per click) — Cost: " + upgradeCost;
-    }
+    }  
+    async function updateDownloads() {
+  try {
+    const response = await fetch(
+      "https://coin-clicker-server.onrender.com/count",
+      {
+        method: "POST"
+      }
+    );
+
+    const data = await response.json();
+
+    document.getElementById("downloads").textContent =
+      data.totalDownloads;
+  } catch (error) {
+    console.error("Download counter error:", error);
+  }
+}
+
+updateDownloads();
   </script>
 
 </body>
