@@ -16,30 +16,36 @@ const supabase = createClient(
 app.get("/count", async (req, res) => {
   const { data, error } = await supabase
     .from("game_stats")
-    .select("total_downloads")
-    .eq("id", 1)
-    .single();
+    .select("id, total_downloads")
+    .eq("id", 1);
 
   if (error) {
     return res.status(500).json({ error: error.message });
   }
 
-  res.json({ totalDownloads: data.total_downloads });
+  if (!data || data.length === 0) {
+    return res.status(404).json({ error: "Counter row not found" });
+  }
+
+  res.json({ totalDownloads: data[0].total_downloads });
 });
 
 // Add 1 to the total
 app.post("/count", async (req, res) => {
   const { data, error } = await supabase
     .from("game_stats")
-    .select("total_downloads")
-    .eq("id", 1)
-    .single();
+    .select("id, total_downloads")
+    .eq("id", 1);
 
   if (error) {
     return res.status(500).json({ error: error.message });
   }
 
-  const newTotal = data.total_downloads + 1;
+  if (!data || data.length === 0) {
+    return res.status(404).json({ error: "Counter row not found" });
+  }
+
+  const newTotal = data[0].total_downloads + 1;
 
   const { error: updateError } = await supabase
     .from("game_stats")
