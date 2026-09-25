@@ -75,9 +75,9 @@
   </div>
 
   <script>
-    let coins = 0;
-    let power = 1;
-    let upgradeCost = 25;
+   let coins = Number(localStorage.getItem("coins")) || 0;
+let power = Number(localStorage.getItem("power")) || 1;
+let upgradeCost = Number(localStorage.getItem("upgradeCost")) || 25;
 
     let audioContext;
     let musicOn = false;
@@ -182,9 +182,16 @@
       }
     });
 
-    function updateGame() {
-      score.textContent = "Coins: " + coins;
+   function updateGame() {
+  score.textContent = "Coins: " + coins;
 
+  upgradeButton.textContent =
+    "Upgrade (+" + power + " per click) — Cost: " + upgradeCost;
+
+  localStorage.setItem("coins", coins);
+  localStorage.setItem("power", power);
+  localStorage.setItem("upgradeCost", upgradeCost);
+}
       upgradeButton.textContent =
         "Upgrade (+" + power + " per click) — Cost: " + upgradeCost;
     }  
@@ -211,3 +218,4 @@ updateDownloads();
 
 </body>
 </html>
+updateGame();
