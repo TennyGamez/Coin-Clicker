@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,6 +10,7 @@
       text-align: center;
       background: #f0f0f0;
       padding-top: 60px;
+      overflow-x: hidden;
     }
 
     h1 {
@@ -50,10 +52,38 @@
       margin-top: 40px;
       font-size: 20px;
     }
+
+    /* Falling coins */
+    #fallingCoins {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .falling-coin {
+      position: absolute;
+      top: -50px;
+      font-size: 30px;
+      animation: fall linear;
+    }
+
+    @keyframes fall {
+      from {
+        transform: translateY(-50px) rotate(0deg);
+      }
+
+      to {
+        transform: translateY(110vh) rotate(360deg);
+      }
+    }
   </style>
 </head>
 
 <body>
+
+  <div id="fallingCoins"></div>
 
   <h1>🪙 Coin Clicker</h1>
 
@@ -76,42 +106,25 @@
   </div>
 
   <script>
-    // =========================
-    // SAVED GAME DATA
-    // =========================
-
+    // Load saved game
     let coins = Number(localStorage.getItem("coins")) || 0;
     let power = Number(localStorage.getItem("power")) || 1;
     let upgradeCost = Number(localStorage.getItem("upgradeCost")) || 25;
-
-
-    // =========================
-    // AUDIO
-    // =========================
 
     let audioContext;
     let musicOn = false;
     let musicTimer;
 
-
-    // =========================
-    // ELEMENTS
-    // =========================
-
     const score = document.getElementById("score");
     const clickButton = document.getElementById("clickButton");
     const upgradeButton = document.getElementById("upgradeButton");
     const musicButton = document.getElementById("musicButton");
-    const downloads = document.getElementById("downloads");
 
-
-    // =========================
-    // START AUDIO
-    // =========================
-
+    // Start audio
     function startAudio() {
       if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioContext =
+          new (window.AudioContext || window.webkitAudioContext)();
       }
 
       if (audioContext.state === "suspended") {
@@ -119,11 +132,7 @@
       }
     }
 
-
-    // =========================
-    // SOUND
-    // =========================
-
+    // Play sound
     function playSound(frequency, duration, type, volume) {
       startAudio();
 
@@ -153,12 +162,12 @@
       );
     }
 
-
+    // Click sound
     function playClickSound() {
       playSound(750, 0.07, "square", 0.10);
     }
 
-
+    // Upgrade sound
     function playUpgradeSound() {
       playSound(500, 0.12, "sine", 0.15);
 
@@ -167,11 +176,7 @@
       }, 100);
     }
 
-
-    // =========================
-    // MUSIC
-    // =========================
-
+    // Music
     function playMusicNote() {
       if (!musicOn) return;
 
@@ -188,22 +193,14 @@
       playSound(note, 0.3, "sine", 0.035);
     }
 
-
-    // =========================
-    // SAVE GAME
-    // =========================
-
+    // Save game
     function saveGame() {
       localStorage.setItem("coins", coins);
       localStorage.setItem("power", power);
       localStorage.setItem("upgradeCost", upgradeCost);
     }
 
-
-    // =========================
-    // UPDATE GAME
-    // =========================
-
+    // Update game
     function updateGame() {
       score.textContent = "Coins: " + coins;
 
@@ -216,11 +213,7 @@
       saveGame();
     }
 
-
-    // =========================
-    // CLICK COIN
-    // =========================
-
+    // Click button
     clickButton.addEventListener("click", function() {
       coins += power;
 
@@ -229,19 +222,12 @@
       updateGame();
     });
 
-
-    // =========================
-    // UPGRADE
-    // =========================
-
+    // Upgrade button
     upgradeButton.addEventListener("click", function() {
-
       if (coins >= upgradeCost) {
 
         coins -= upgradeCost;
-
         power += 1;
-
         upgradeCost *= 2;
 
         playUpgradeSound();
@@ -256,17 +242,11 @@
           "sawtooth",
           0.08
         );
-
       }
     });
 
-
-    // =========================
-    // MUSIC BUTTON
-    // =========================
-
+    // Music button
     musicButton.addEventListener("click", function() {
-
       startAudio();
 
       musicOn = !musicOn;
@@ -294,13 +274,8 @@
       }
     });
 
-
-    // =========================
-    // GLOBAL COUNTER
-    // =========================
-
+    // Global download counter
     async function updateDownloads() {
-
       try {
 
         const response = await fetch(
@@ -312,12 +287,8 @@
 
         const data = await response.json();
 
-        if (data.totalDownloads !== undefined) {
-
-          downloads.textContent =
-            data.totalDownloads;
-
-        }
+        document.getElementById("downloads").textContent =
+          data.totalDownloads;
 
       } catch (error) {
 
@@ -325,20 +296,50 @@
           "Download counter error:",
           error
         );
-
       }
     }
 
+    // Create falling coin
+    function createFallingCoin() {
 
-    // =========================
-    // START GAME
-    // =========================
+      const coin =
+        document.createElement("div");
 
+      coin.className = "falling-coin";
+
+      coin.textContent = "🪙";
+
+      coin.style.left =
+        Math.random() * 100 + "%";
+
+      coin.style.fontSize =
+        (20 + Math.random() * 25) + "px";
+
+      coin.style.animationDuration =
+        (3 + Math.random() * 5) + "s";
+
+      document
+        .getElementById("fallingCoins")
+        .appendChild(coin);
+
+      setTimeout(function() {
+        coin.remove();
+      }, 8000);
+    }
+
+    // Keep creating coins
+    setInterval(
+      createFallingCoin,
+      400
+    );
+
+    // Load saved game on startup
     updateGame();
 
+    // Update global counter
     updateDownloads();
-
   </script>
 
 </body>
 </html>
+```
